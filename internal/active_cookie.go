@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +22,7 @@ type Cookie struct {
 func RunCookieFinder(cmd *cobra.Command, args []string) error {
 	fileName, _ := cmd.Flags().GetString("file")
 	date, _ := cmd.Flags().GetString("date")
+	logrus.Debugf("recieved file name %s and date %s", fileName, date)
 
 	targetDate, err := parseDateFromString(date)
 
@@ -29,7 +31,7 @@ func RunCookieFinder(cmd *cobra.Command, args []string) error {
 	}
 
 	cookies, err := LoadCookies(fileName)
-	// fmt.Printf("%+v", cookies)
+	logrus.Debugf("%+v", cookies)
 
 	if err != nil {
 		return err
@@ -40,7 +42,7 @@ func RunCookieFinder(cmd *cobra.Command, args []string) error {
 		fmt.Println("no cookies found on given day")
 		return nil
 	}
-	// fmt.Printf("%+v", most_active_cookies)
+	logrus.Debugf("%+v", most_active_cookies)
 
 	for _, cookie_ids := range most_active_cookies {
 		fmt.Println(cookie_ids)
@@ -58,7 +60,7 @@ func FindMostActive(cookies []Cookie, targetDate time.Time) []string {
 		if targetDate.After(c.Day) {
 			break //we can stop if the target date is after the current cookie since it's ordered from most recent
 		}
-		// logrus.Infof("checking cookie %s", c.ID)
+		logrus.Debugf("checking cookie %s", c.ID)
 		if c.Day.Equal(targetDate) {
 			cookieCount[c.ID]++
 			if cookieCount[c.ID] > maxCount {
